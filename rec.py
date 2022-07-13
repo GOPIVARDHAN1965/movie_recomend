@@ -3,6 +3,10 @@ from sklearn.neighbors import NearestNeighbors
 import matplotlib.pyplot as plt
 from scipy.sparse import csr_matrix
 
+def movie(name):
+    movie_rec(name)
+
+
 
 def movie_rec(movie_name):
     movie_list = movies[movies['title'].str.contains(movie_name)]
@@ -35,7 +39,6 @@ final_dataset = final_dataset.loc[:,movies_rated_by_users[movies_rated_by_users>
 csr_data = csr_matrix(final_dataset.values)
 final_dataset.reset_index(inplace=True)
 
-s=input("Enter movie name ")
-movie_rec(s)
+
 
 # print(final_dataset)
