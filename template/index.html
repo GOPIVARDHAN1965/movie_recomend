@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body{
+            background-color:rgb(55, 52, 52);
+            color: aliceblue;
+            justify-content: center;
+            align-items: center;
+        }
+        h4{
+            text-align: center;
+        }
+        form{
+            text-align: center;
+        }
+        .list{
+            align-items: center;
+            justify-content: center;
+            display: flex;
+        }
+    </style>
+    <title>Movie Recommender</title>
+  </head>
+
+  <body>
+    <form action="/" method="POST">
+        <input type="text" name="movie" id="movie" class="">
+        <input type="submit" value="search movie" class="">
+    </form>
+    <div class="list">
+        {% if list|length<1 %}
+        <h4> search the movie name </h4>
+        {% else %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Recommended Movies</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for movie in list %}
+                <tr>
+                    <td>{{ movie }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+
+  </body>
+</html>

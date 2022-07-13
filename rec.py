@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 from scipy.sparse import csr_matrix
 
 def movie(name):
-    movie_rec(name)
+    return movie_rec(name)
+    
 
 
 
@@ -15,10 +16,12 @@ def movie_rec(movie_name):
     knn.fit(csr_data)
     similarities,indeces=knn.kneighbors(csr_data[final_dataset[final_dataset['movieId'] == movie_index].index[0]],n_neighbors=11)
     rec = sorted(zip(indeces.squeeze().tolist(),similarities.squeeze().tolist()),key=lambda x:x[1])[:0:-1]
+    l=[]
     for val in rec:
         movie_Id = final_dataset.iloc[val[0]]['movieId']
+        l.append(movies[movies['movieId']==movie_Id]['title'].values[0])
         print(movies[movies['movieId']==movie_Id]['title'].values[0])
-
+    return l
 
 movies = pd.read_csv('movies.csv')
 ratings = pd.read_csv('ratings.csv')
