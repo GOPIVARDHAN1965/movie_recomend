@@ -4,7 +4,18 @@ import matplotlib.pyplot as plt
 from scipy.sparse import csr_matrix
 
 def movie(name):
-    return movie_rec(name)
+    get_name = name.split(' ')
+    correct_name=''
+    for index in range(len(get_name)):
+        if index==0 and get_name[index].isalpha():
+            get_name[index]=get_name[index].capitalize()
+            correct_name+=get_name[index]
+        elif get_name[index].isalpha():
+            get_name[index]=get_name[index].capitalize()
+            correct_name+=' '+get_name[index]
+        else:
+            correct_name+=' '+get_name[index]
+    return movie_rec(correct_name)
     
 
 
