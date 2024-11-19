@@ -2,6 +2,8 @@ import pandas as pd
 from sklearn.neighbors import NearestNeighbors
 import matplotlib.pyplot as plt
 from scipy.sparse import csr_matrix
+from fuzzywuzzy import process
+
 
 def movie(name):
     get_name = name.split(' ')
@@ -15,24 +17,51 @@ def movie(name):
             correct_name+=' '+get_name[index]
         else:
             correct_name+=' '+get_name[index]
+        print(correct_name)
     return movie_rec(correct_name)
     
 
 
-
 def movie_rec(movie_name):
-    movie_list = movies[movies['title'].str.contains(movie_name)]
-    movie_index = movie_list.iloc[0]['movieId']
-    knn=NearestNeighbors(metric='cosine',n_neighbors=20)
-    knn.fit(csr_data)
-    similarities,indeces=knn.kneighbors(csr_data[final_dataset[final_dataset['movieId'] == movie_index].index[0]],n_neighbors=11)
-    rec = sorted(zip(indeces.squeeze().tolist(),similarities.squeeze().tolist()),key=lambda x:x[1])[:0:-1]
-    l=[]
-    for val in rec:
-        movie_Id = final_dataset.iloc[val[0]]['movieId']
-        l.append(movies[movies['movieId']==movie_Id]['title'].values[0])
-        print(movies[movies['movieId']==movie_Id]['title'].values[0])
-    return l
+    # Preprocess titles
+    movies['clean_title'] = movies['title'].str.lower().str.split('(').str[0].str.strip()
+    # Fuzzy matching
+    matches = process.extract(movie_name.lower(), movies['clean_title'], limit=5)
+    if not matches:
+        print(f"No matches found for '{movie_name}'")
+        return
+    # Pick the best match above a confidence threshold
+    best_match = matches[0]
+    if best_match[1] >= 75:  # Confidence score
+        movie_index = movies.iloc[best_match[2]]['movieId']
+        print(f"Match found: {best_match[0]} (MovieId: {movie_index})")
+        # Continue with KNN or other logic...
+        # movie_index = movie_list.iloc[0]['movieId']
+        knn=NearestNeighbors(metric='cosine',n_neighbors=20)
+        knn.fit(csr_data)
+        similarities,indeces=knn.kneighbors(csr_data[final_dataset[final_dataset['movieId'] == movie_index].index[0]],n_neighbors=11)
+        rec = sorted(zip(indeces.squeeze().tolist(),similarities.squeeze().tolist()),key=lambda x:x[1])[:0:-1]
+        l=[]
+        for val in rec:
+            movie_Id = final_dataset.iloc[val[0]]['movieId']
+            l.append(movies[movies['movieId']==movie_Id]['title'].values[0])
+            print(movies[movies['movieId']==movie_Id]['title'].values[0])
+        return l
+    else:
+        print(f"No good match found for '{movie_name}'")
+# def movie_rec(movie_name):
+    # movie_list = movies[movies['title'].str.contains(movie_name)]
+    # movie_index = movie_list.iloc[0]['movieId']
+    # knn=NearestNeighbors(metric='cosine',n_neighbors=20)
+    # knn.fit(csr_data)
+    # similarities,indeces=knn.kneighbors(csr_data[final_dataset[final_dataset['movieId'] == movie_index].index[0]],n_neighbors=11)
+    # rec = sorted(zip(indeces.squeeze().tolist(),similarities.squeeze().tolist()),key=lambda x:x[1])[:0:-1]
+    # l=[]
+    # for val in rec:
+    #     movie_Id = final_dataset.iloc[val[0]]['movieId']
+    #     l.append(movies[movies['movieId']==movie_Id]['title'].values[0])
+    #     print(movies[movies['movieId']==movie_Id]['title'].values[0])
+    # return l
 
 movies = pd.read_csv('movies.csv')
 ratings = pd.read_csv('ratings.csv')
